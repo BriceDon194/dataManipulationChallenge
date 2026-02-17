@@ -273,17 +273,17 @@ What's wrong with the `lateStatement` assignment and how would you fix it?
 
 ::: {.callout-tip}
 ## Your Answer: Data Types and Date Handling
-*Replace this with your answer to Question 1.*
+*Both actualShipDate and plannedShipDate are datetime64[ns] which is the default dtype for dates in pandas. This is the correct dtype for dates and allows for easy comparison and calculation. If the dates were stored as strings, you would need to convert them to datetime objects before comparing them. Both need to be the same data type to compare them. You can check the data type of a column using the .dtype attribute.*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: String vs Date Comparison
-*Replace this with your answer to Question 2.*
+*When comparing two dates as strings, the order of the dates is determined by the order of the strings. This means that "04-11-2025" comes before "05-20-2024" even though 04-11-2025 is actually after 05-20-2024. This is because the strings are compared character by character, and the first character that differs is the '0' in '04' compared to the '5' in '05'. Also if you try to find the difference between the two dates as strings, you will get a TypeError because you cannot subtract two strings. You can convert the strings to datetime objects using pd.to_datetime() and then subtract the dates.*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: Debug This Code
-*Replace this with your answer to Question 3.*
+*The lateStatement raises a value error because a series cannot be evaluated for a boolean series. IT is not following the lambda pattern used by the other assignments. LateStatement should say latestatement = lambda df: np.where(df['is_late'], "Darn Shipment is Late", "Shipment is on Time")*
 :::
 
 ### 2. Subset: Querying Rows and Filtering Columns
@@ -329,12 +329,12 @@ print(late_shipments.head())
 
 ::: {.callout-tip}
 ## Your Answer: Query vs Boolean Indexing
-*Replace this with your answer to Question 1.*
+*The query function will output only rows that meet the condition of being late whereas using [df['is_late'] == True] will output all rows since its a boolean index which means it is looking for if values exist in the is_late column. Boolean is essntially a yes or no value. If a boolean is true, it exists, if it is false, it does not exist. The query is more readable because it is more descriptive and explains precisely what is being run.*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: Additional Row Querying
-*Replace this with your answer to Question 2.*
+*You can use similar logic to the previous question to create a new column with the late threshold and then use that column to query the rows. You can also use the query function to query the rows for shipments that are at least 5 days late. It would look something like this: late_shipments = (shipments_with_lateness.assign(late_threshold=lambda df: df['days_late'] >= 5).query('late_threshold == True'))*
 :::
 
 ### 3. Drop: Removing Unwanted Data
@@ -373,12 +373,12 @@ print("Remaining columns:", clean_shipments.columns.tolist())
 
 ::: {.callout-tip}
 ## Your Answer: Drop vs Filter Strategies
-*Replace this with your answer to Question 1.*
+*Drop columns removes the columns you request from the data frame itself, whereas filter just returns a set of columns that meet a condition. You would choose to drop columns if you want to remove the columns from the data frame itself and not just the view of the columns. You would choose to filter if you want to only see a subset of the columns.*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: Handling Missing Data
-*Replace this with your answer to Question 2.*
+*Dropna with no subset will remove all rows that are missing any values. Dropna with a subset will remove rows that are missing values in the specified columns. You would want to be selective in a case where you have a lot of columns and you may only want to check for missing values in a few of them.*
 :::
 
 ### 4. Sort: Arranging Data
@@ -417,12 +417,12 @@ print(sorted_by_lateness[['shipID', 'partID', 'days_late', 'is_late']].head(10))
 
 ::: {.callout-tip}
 ## Your Answer: Sorting Strategies
-*Replace this with your answer to Question 1.*
+*Ascending false places the highest values at the top, whereas ascending true places the lowest values at the top. You could sort multiple columns by using a list of columns in the sort_values function. The first column is the first sort codition and the second column is the second sort condition. It would look something like this: sorted_by_lateness = (clean_shipments.sort_values(['is_late', 'days_late'], ascending=[False, False]))*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: Index Management
-*Replace this with your answer to Question 2.*
+*You want to reset the index so that with the new order, the first row is now index 0. Witout using this the first row could be index 1000 resulting in confusing ordering index. The original index is dropped, but this may be problematic if you need to reference the original index later or decide to remove the sorting and default to the original data order.*
 :::
 
 ### 5. Aggregate: Summarizing Data
@@ -463,7 +463,7 @@ print(f"\nOn-time delivery rate: {on_time_rate:.1f}%")
 
 ::: {.callout-tip}
 ## Your Answer: Boolean Aggregation
-*Replace this with your answer to Question 1.*
+*Sum works on boolean values by counting the number of true values in the series. It counts the number of rows that meet the condition of being late.*
 :::
 
 ### 6. Merge: Combining Information
@@ -503,12 +503,12 @@ print(shipments_with_category['prodCategory'].value_counts())
 
 ::: {.callout-tip}
 ## Your Answer: Join Types and Data Loss
-*Replace this with your answer to Question 1.*
+*Left joins keep all rows from the left frame and only the rows from the right frame that are being joined on. You can check if shipments are lost by looking at the row totals of the left and right frames. If the row totals are different, you have lost shipments.*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: Key Column Matching
-*Replace this with your answer to Question 2.*
+*IF there are duplicates, only the first instance of the duplicate will be kept.*
 :::
 
 ### 7. Split-Apply-Combine: Group Analysis
@@ -549,12 +549,12 @@ print(service_by_category)
 
 ::: {.callout-tip}
 ## Your Answer: GroupBy Mechanics
-*Replace this with your answer to Question 1.*
+*Groupby splits the data up by product category and then applies the aggregation function to the data in each group. You need to use agg after grouping because it applies the aggregation function to the data in each group. It also provides data to evaluate for the grouped product categories.*
 :::
 
 ::: {.callout-tip}
 ## Your Answer: Multi-Level Grouping
-*Replace this with your answer to Question 2.*
+*Grouping by ship ID can provide aggregate data for each shipment and its associated product categories. This can provide more information specifically for shipments that have multiple product categories.*
 :::
 
 ## Answering A Business Question
@@ -599,7 +599,7 @@ print(f"Percentage with multiple categories: {multi_category_shipments['shipID']
 
 ::: {.callout-tip}
 ## Your Answer: Business Question Analysis
-*Replace this with your answer to Question 1.*
+*This business analysis provides insight into the breakdown of shipments regarding the amount that share categories and what percentage of total shipments these multiple category shipments themselves make up. This would be useful for ZappTech's management to understand the distribution of shipments and how to improve service levels. It could also provide insight into more efficient shipping routes and distribution based on percentages of shiments that share categories. Grouping by ship ID and product category provides more specific data for each shipment and its associated product categories.*
 :::
 
 ## Student Analysis Section: Mastering Data Manipulation {#student-analysis-section}
@@ -638,6 +638,68 @@ print(f"Percentage with multiple categories: {multi_category_shipments['shipID']
 - Support the insights from your discussion questions
 - Be appropriate for a business audience
 - Do not `echo` the code that creates the visualizations
+
+```{python}
+#| label: service-level-visualization
+#| echo: false
+#| fig-width: 10
+#| fig-height: 6
+
+# Calculate service level (on-time percentage) by product category
+service_level_by_category = (
+    shipments_with_category
+    .query('prodCategory.notna()')  # Filter out rows with missing categories
+    .groupby('prodCategory')
+    .agg({
+        'is_late': ['count', 'sum']  # Count total shipments and late shipments
+    })
+    .assign(
+        on_time_pct=lambda df: (1 - df[('is_late', 'sum')] / df[('is_late', 'count')]) * 100
+    )
+    .reset_index()
+    .sort_values('on_time_pct', ascending=True)
+)
+
+# Flatten column names
+service_level_by_category.columns = ['prodCategory', 'total_shipments', 'late_shipments', 'on_time_pct']
+
+# Create professional bar chart
+plt.figure(figsize=(10, 6))
+colors = plt.cm.RdYlGn(service_level_by_category['on_time_pct'] / 100)  # Green for high, red for low
+bars = plt.barh(service_level_by_category['prodCategory'], 
+                service_level_by_category['on_time_pct'],
+                color=colors,
+                edgecolor='black',
+                linewidth=0.5)
+
+# Add value labels on bars
+for i, (category, pct) in enumerate(zip(service_level_by_category['prodCategory'], 
+                                        service_level_by_category['on_time_pct'])):
+    plt.text(pct + 0.5, i, f'{pct:.1f}%', 
+             va='center', fontsize=10, fontweight='bold')
+
+# Formatting
+plt.xlabel('On-Time Delivery Rate (%)', fontsize=12, fontweight='bold')
+plt.ylabel('Product Category', fontsize=12, fontweight='bold')
+plt.title('Service Level by Product Category\nOn-Time Shipping Performance', 
+          fontsize=14, fontweight='bold', pad=20)
+plt.xlim(0, 105)
+plt.grid(axis='x', alpha=0.3, linestyle='--')
+plt.axvline(x=95, color='orange', linestyle='--', linewidth=2, alpha=0.7, label='95% Target')
+plt.legend(loc='lower right', fontsize=10)
+
+# Improve layout
+plt.tight_layout()
+plt.show()
+
+# Print summary statistics
+print("\n" + "="*60)
+print("Service Level Summary by Product Category")
+print("="*60)
+print(service_level_by_category[['prodCategory', 'total_shipments', 'on_time_pct']].to_string(index=False))
+print("\nOverall Average On-Time Rate:", 
+      f"{(1 - shipments_with_category['is_late'].mean()) * 100:.1f}%")
+```
 
 ## Grading Rubric 🎓 {#grading-rubric}
 
